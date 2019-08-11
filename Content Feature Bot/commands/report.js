@@ -5,29 +5,24 @@
 // imports discord.js for bot commands
 const Discord  = require("discord.js");
 var Promise = require('bluebird');
-const mongoose = require("mongoose");
-// Connects to a mongodb dabatase using the node.js package Mongoose.
-mongoose.connect('mongodb://localhost/Reports');
-// Creates a mongoose schema that's used to format the report in the database.
-const reportSchema = mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  username: String,
-  userID: String,
-  reason: String,
-  rBy: String,
-  rID: String,
-  time: String
-});
-// Makes an object that will be used to generate a report that can then be stored in the mongoDB databse.
-var Report = mongoose.model("Report", reportSchema);
+
 // Instantiates the Node.js module that will run the inputted arguments from the Index.js file.
 module.exports.run = async (bot, message,args) => {
   // The program waits until the initial message is deleted.
   await message.delete();
   // Checks if the author is the bot owner.
   if(message.author.id != '258438246973833219') return;
+
   // Finds the first mentioned user in the message. This is the user that is being reported.
-  let rUser = message.mentions.members.first();
+  try{
+    console.log(args[0]);
+  let rUser = message.mentions.users.first()
+
+  }
+  catch(error){
+    message.reply("Sorry that user doesn't exist")
+    return
+  }
   // Checks if the message has a member that was mentioned.
   if(!rUser) return message.reply("Can't find that member.")
   // Gets the reason for the report.
@@ -48,21 +43,7 @@ module.exports.run = async (bot, message,args) => {
   if(!reportschannel) return message.channel.send("Couldn't find reports channel");
   // Sends the report.
   reportschannel.send(reportEmbed);
-// Creates a new report using a Schema from Mongoose.
-  var report = new Report({
-    _id: new mongoose.Types.ObjectId(),
-    username: rUser.user.username,
-    userID: rUser.id,
-    reason: rreason,
-    rBy: message.author.username,
-    rID: message.author.id,
-    time: message.createdAt
-  });
-  // Saves the report posting it to the databse.
-  report.save()
-  .then(result => console.log(result))
-  .catch(err => console.log(err));
-  message.channel.send("Recorded");
+
 }
 module.exports.help = {
   name: "report"

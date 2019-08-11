@@ -15,6 +15,7 @@ module.exports.run = async (bot, message, args) => {
   if(!newPre) {message.reply("Please specify a new prefix"); return;}
   //Sets the new prefix
   config.prefix = newPre;
+  message.reply("Your prefix has changed!")
 }
 module.exports.help = {
   name: "setPrefix"
