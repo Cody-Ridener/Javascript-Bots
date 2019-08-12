@@ -45,15 +45,7 @@ bot.on("ready", async()=>{
   guilds = bot.guilds.array();
 
   for(var i = 0; i<guilds.length;i++){
-    guild_name_split = guilds[i].name.split(" ");
-    guild_name = ""
-    for(var j = 1; j<= guild_name_split.length; j++){
-      if(j == guild_name_split.length){
-        guild_name = guild_name+guild_name_split[j-1];
-      }else{
-        guild_name = guild_name+guild_name_split[j-1]+"_";
-      }
-    }
+    guild_name = guilds[i].id;
     pool.query("CREATE DATABASE " + guild_name, (err,res) => {
       if(err){
         console.log(guild_name+ " already exists")
@@ -64,15 +56,7 @@ bot.on("ready", async()=>{
   }
 })
 bot.on("guildCreate", guild => {
-  guild_name_split = guild.name.split(" ")
-  guild_name = ""
-  for(var j = 1; j<= guild_name_split.length; j++){
-    if(j == guild_name_split.length){
-      guild_name = guild_name+guild_name_split[j-1];
-    }else{
-      guild_name = guild_name+guild_name_split[j-1]+"_";
-    }
-  }
+  guild_name = guild.id;
   pool.query("CREATE DATABASE " + guild_name, (err,res) => {
     if(err){
       console.log("There was a problem.")
@@ -86,15 +70,9 @@ bot.on("guildCreate", guild => {
 bot.on("message", async message =>{
   // Ignores any messages sent by the bot
   var server
-  guild_name_split = message.guild.name.split(" ")
-  guild_name = ""
-  for(var j = 1; j<= guild_name_split.length; j++){
-    if(j == guild_name_split.length){
-      guild_name = guild_name+guild_name_split[j-1];
-    }else{
-      guild_name = guild_name+guild_name_split[j-1]+"_";
-    }
-  }
+
+  guild_name = message.guild.id;
+
   server = new Pool({
   user: 'yona',
   host: 'localhost',

@@ -28,7 +28,7 @@ module.exports.run = async (bot, message, args,pool, update) => {
   // Collects the user's data that will be inputted into the postgres database.
   var data =
     [
-      message.id, message.author.username,message.createdAt.getYear(),message.createdAt.getMonth(), message.createdAt.getDay(),
+      message.id,message.author.id, message.author.username,message.createdAt.getYear(),message.createdAt.getMonth(), message.createdAt.getDay(),
       message.createdAt.getDate(), message.createdAt.getHours(), message.channel.name, message.content, numEmbeds, embedProviders
     ];
     // A query using nose pg that will insert the data into the postgres database that the bot is connected to.
@@ -47,8 +47,8 @@ module.exports.run = async (bot, message, args,pool, update) => {
         }
       })
     }else{
-    pool.query("CREATE TABLE users(messageID varchar(80), name varchar(80),year int, month int, weekday int, date int, hour int, channel varchar(80), content text, embeds int, embedProviders text)", (err,res) =>{
-      pool.query("INSERT INTO users(messageID, name,year, month, weekday, date, hour, channel, content, embeds, embedproviders) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11)", data, (err, res) =>{
+    pool.query("CREATE TABLE users(messageID varchar(80),userID varchar(80), name varchar(80),year int, month int, weekday int, date int, hour int, channel varchar(80), content text, embeds int, embedProviders text)", (err,res) =>{
+      pool.query("INSERT INTO users(messageID,userID, name,year, month, weekday, date, hour, channel, content, embeds, embedproviders) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11)", data, (err, res) =>{
         if(err){
           console.log('Something went wrong while inserting data into ' + message.guild.name + 's database.')
         }
