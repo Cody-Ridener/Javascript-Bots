@@ -28,7 +28,7 @@ module.exports.run = async (bot, message, args,pool, update) => {
   // Collects the user's data that will be inputted into the postgres database.
   var data =
     [
-      message.id,message.author.id, message.author.username,message.createdAt.getYear(),message.createdAt.getMonth(), message.createdAt.getDay(),
+      message.id,message.author.id, message.author.username,message.createdAt.getFullYear(),message.createdAt.getMonth(), message.createdAt.getDay(),
       message.createdAt.getDate(), message.createdAt.getHours(), message.channel.id,message.channel.name, message.content, numEmbeds, embedProviders
     ];
     // A query using nose pg that will insert the data into the postgres database that the bot is connected to.
