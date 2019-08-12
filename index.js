@@ -13,7 +13,7 @@ const pool = new Pool({
   password: 'saintyona',
   port: 5432,
 });
-const botconfig = require("/../botconfig.json");
+const botconfig = require("../botconfig.json");
 const Discord = require("discord.js");
 const bot = new Discord.Client({disableEveryone:true})
 const fs = require("fs")
