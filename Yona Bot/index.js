@@ -118,10 +118,12 @@ bot.on("message", async message =>{
     commandfile.run(bot,message,args)
   }
   else{
-    bot.commands.get('writeContents').run(bot,message,args, server);
+    bot.commands.get('writeContents').run(bot,message,args, server, false);
   }
 })
-bot.on("messageUpdate", async message =>{
+bot.on("messageUpdate", async (message, update) =>{
+  if(message.author.bot) return;
+  if(message.channel.type == "dm") return;
   var server
   guild_name_split = message.guild.name.split(" ")
   guild_name = ""
@@ -138,6 +140,17 @@ bot.on("messageUpdate", async message =>{
   database: guild_name.toLowerCase(),
   password: 'saintyona'
 })
+let messageArray = message.content.split(" ");
+let args = messageArray.slice(1);
+bot.commands.get('writeContents').run(bot,update,args,server,true);
 });
 // Logs the bot in.
 bot.login(botconfig.token);
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
