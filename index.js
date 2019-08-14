@@ -16,11 +16,14 @@ const pool = new Pool({
 const botconfig = require("../botconfig.json");
 const Discord = require("discord.js");
 const bot = new Discord.Client({disableEveryone:true})
-const fs = require("fs")
-var Promise = require('bluebird');
+const mkTables = require('./commands/helpers/makeTables');
+const fs = require('fs');
+const gDB = require('./commands/helpers/generateDB');
 // A collection for storing all of the commands.
 bot.commands = new Discord.Collection();
-// Imports all of the commands from the commands file.
+
+
+// Imports all of the commands from the commands directory.
 fs.readdir("./commands/", (err,files) => {
   // Gives and error if the program encounters a problem.
   if(err) console.log(err);
@@ -38,34 +41,33 @@ fs.readdir("./commands/", (err,files) => {
   });
 });
 
-
+// The main methods for the bot.
 bot.on("ready", async()=>{
   console.log(`${bot.user.username} is online!`)
-  bot.user.setActivity("Cuckvania");
   guilds = bot.guilds.array();
-  for(var i = 0; i<guilds.length;i++){
-    guild_name = guilds[i].id;
-    pool.query(`CREATE DATABASE "${guild_name}"`, (err,res) => {
-      if(err){
-        console.log(guild_name+ " already exists")
-
-      }else{
-        console.log(guild_name+ " successfully created")
-      }
-    })
-  }
-})
-bot.on("guildCreate", guild => {
-  guild_name = guild.id.toString();
-  pool.query("CREATE DATABASE " + guild_name, (err,res) => {
-    if(err){
-      console.log("There was a problem.")
-    }else{
-      console.log("Database generated")
-    }
+  guilds.forEach(function(guild){
+    gDB.run(guild,pool);
+    var db = new Pool({
+    user: 'yona',
+    host: 'localhost',
+    database: guild.id.toString().toLowerCase(),
+    password: 'saintyona'
+  });
+    mkTables.run(db);
   })
 
-})
+
+});
+bot.on("guildCreate", guild => {
+    gDB.run(guild, pool)
+    var db = new Pool({
+    user: 'yona',
+    host: 'localhost',
+    database: guild_name.toLowerCase(),
+    password: 'saintyona'
+    })
+    mkTables.run(db);
+  });
 
 bot.on("message", async message =>{
   // Ignores any messages sent by the bot
