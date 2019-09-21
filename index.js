@@ -1,4 +1,4 @@
-// Last Edited 8/1/19
+// Last Edited 8/13/19
 // Written by Cody Ridener
 // Name: Index.js
 // Main file for running all the commands given to the bot. With more apples
@@ -21,8 +21,6 @@ const fs = require('fs');
 const gDB = require('./commands/helpers/generateDB');
 // A collection for storing all of the commands.
 bot.commands = new Discord.Collection();
-
-
 // Imports all of the commands from the commands directory.
 fs.readdir("./commands/", (err,files) => {
   // Gives and error if the program encounters a problem.
@@ -40,8 +38,10 @@ fs.readdir("./commands/", (err,files) => {
     bot.commands.set(props.help.name, props);
   });
 });
-
-// The main methods for the bot.
+// The main methods for the bot
+// Creates databases when the bot logs on, if the databases already exist the
+// code will just move on. Also initializes all tables to be used in the
+// databases.
 bot.on("ready", async()=>{
   console.log(`${bot.user.username} is online!`)
   guilds = bot.guilds.array();
@@ -58,6 +58,8 @@ bot.on("ready", async()=>{
 
 
 });
+// If the active bot is added to another server it will immediately create a new
+// database with the appropriate tables for the server.
 bot.on("guildCreate", guild => {
     gDB.run(guild, pool)
     var db = new Pool({
@@ -68,7 +70,8 @@ bot.on("guildCreate", guild => {
     })
     mkTables.run(db);
   });
-
+// A message handler for the bot. Scans messages and determines which commands
+// to use based on the message content.
 bot.on("message", async message =>{
   // Ignores any messages sent by the bot
   var server
@@ -95,12 +98,13 @@ bot.on("message", async message =>{
   //Cuts off the prefix and sends the command issued to the bot to be ran
   let commandfile = bot.commands.get(cmd.slice(prefix.length));
   if(commandfile) {
-    commandfile.run(bot,message,args)
+    commandfile.run(bot,message,args,server)
   }
   else{
     bot.commands.get('writeContents').run(bot,message,args, server, false);
   }
 })
+// When a message update is made a log is made in the database to reflect that.
 bot.on("messageUpdate", async (message, update) =>{
   if(message.author.bot) return;
   if(message.channel.type == "dm") return;
