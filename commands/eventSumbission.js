@@ -2,8 +2,8 @@
 // a local directory.
 // Created by: Cody Ridener
 // Created on: 10/5/2019
-module.exports.run = async (bot, message,args, server) => {
-  
+module.exports.run = async (bot, message,) => {
+  message.channel.send("Hello There!");
 }
 
 

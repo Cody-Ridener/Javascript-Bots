@@ -13,7 +13,8 @@ const pool = new Pool({
   password: 'saintyona',
   port: 5432,
 });
-const watchedMessages = require("./data/watchedMessages.json")
+const watchedChannels = require("./data/watchedChannels.json");
+const watchedMessages = require("./data/watchedMessages.json");
 const botconfig = require("./data/botconfig.json");
 const Discord = require("discord.js");
 const bot = new Discord.Client({disableEveryone:true})
@@ -88,17 +89,26 @@ bot.on("guildCreate", guild => {
 // A message handler for the bot. Scans messages and determines which commands
 // to use based on the message content.
 bot.on("message", async message =>{
-  // Ignores any messages sent by the bot
+  // Checks if the bot is messaging in an accepted channel.
+  var acceptCommand = false;
+  if (watchedChannels.channels.length == 0) acceptCommand = true;
+  else if (watchedChannels.channels.includes(message.channel)) {
+    acceptCommand = true
+  }
+  else acceptCommand = false;
+  // Instantiates a postgres Server instance.
   var server
-
   guild_name = message.guild.id.toString();
-
   server = new Pool({
   user: 'yona',
   host: 'localhost',
   database: guild_name.toLowerCase(),
   password: 'saintyona'
 })
+
+  if(message.author.bot) return;
+  // Ignores all DM's
+  if(message.channel.type == "dm") return;
   //makes a list of all mentioned users.
   var mentioned = Array.from(message.mentions.users);
   // A variable to check if the bot was mentioned
@@ -106,10 +116,7 @@ bot.on("message", async message =>{
   // Sets bot mentioned to true if the bot was mentioned.
   mentioned.forEach(a => {if (a[0] == '594462181014110209') botMentioned = true;})
   //checks if the message mentioned the bot
-  if(botMentioned) bot.commands.get.('eventSubmission');
-  if(message.author.bot) return;
-  // Ignores all DM's
-  if(message.channel.type == "dm") return;
+  if(botMentioned & acceptCommand) bot.commands.get('eventSubmission').run(bot, message);
   let prefix = botconfig.prefix;
   // Splits the message into different parts.
   let messageArray = message.content.split(" ");
@@ -118,7 +125,7 @@ bot.on("message", async message =>{
   let args = messageArray.slice(1);
   //Cuts off the prefix and sends the command issued to the bot to be ran
   let commandfile = bot.commands.get(cmd.slice(prefix.length));
-  if(commandfile) {
+  if(commandfile & acceptCommand) {
     commandfile.run(bot,message,args,server)
   }
   else{
