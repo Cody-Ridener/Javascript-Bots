@@ -3,7 +3,7 @@
 // Name: Index.js
 // Main file for running all the commands given to the bot. With more apples
 
-
+//////////////////////////////////////////////////////////
 // Constants to be used in the code.
 const {Pool, Client} = require('pg');
 const pool = new Pool({
@@ -13,12 +13,17 @@ const pool = new Pool({
   password: 'saintyona',
   port: 5432,
 });
-const botconfig = require("../botconfig.json");
+const watchedMessages = require("./data/watchedMessages.json")
+const botconfig = require("./data/botconfig.json");
 const Discord = require("discord.js");
 const bot = new Discord.Client({disableEveryone:true})
 const mkTables = require('./commands/helpers/makeTables');
 const fs = require('fs');
 const gDB = require('./commands/helpers/generateDB');
+//////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////
 // A collection for storing all of the commands.
 bot.commands = new Discord.Collection();
 // Imports all of the commands from the commands directory.
@@ -38,6 +43,10 @@ fs.readdir("./commands/", (err,files) => {
     bot.commands.set(props.help.name, props);
   });
 });
+//////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////
 // The main methods for the bot
 // Creates databases when the bot logs on, if the databases already exist the
 // code will just move on. Also initializes all tables to be used in the
@@ -55,9 +64,11 @@ bot.on("ready", async()=>{
   });
     mkTables.run(db);
   })
-
-
 });
+//////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////
 // If the active bot is added to another server it will immediately create a new
 // database with the appropriate tables for the server.
 bot.on("guildCreate", guild => {
@@ -70,6 +81,10 @@ bot.on("guildCreate", guild => {
     })
     mkTables.run(db);
   });
+//////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////
 // A message handler for the bot. Scans messages and determines which commands
 // to use based on the message content.
 bot.on("message", async message =>{
@@ -84,8 +99,14 @@ bot.on("message", async message =>{
   database: guild_name.toLowerCase(),
   password: 'saintyona'
 })
-
-
+  //makes a list of all mentioned users.
+  var mentioned = Array.from(message.mentions.users);
+  // A variable to check if the bot was mentioned
+  var botMentioned = false;
+  // Sets bot mentioned to true if the bot was mentioned.
+  mentioned.forEach(a => {if (a[0] == '594462181014110209') botMentioned = true;})
+  //checks if the message mentioned the bot
+  if(botMentioned) bot.commands.get.('eventSubmission');
   if(message.author.bot) return;
   // Ignores all DM's
   if(message.channel.type == "dm") return;
@@ -104,6 +125,10 @@ bot.on("message", async message =>{
     bot.commands.get('writeContents').run(bot,message,args, server, false);
   }
 })
+//////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////
 // When a message update is made a log is made in the database to reflect that.
 bot.on("messageUpdate", async (message, update) =>{
   if(message.author.bot) return;
@@ -121,5 +146,8 @@ let messageArray = message.content.split(" ");
 let args = messageArray.slice(1);
 bot.commands.get('writeContents').run(bot,update,args,server,true);
 });
+//////////////////////////////////////////////////////////
+
+
 // Logs the bot in.
 bot.login(botconfig.token);

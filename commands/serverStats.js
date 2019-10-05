@@ -4,7 +4,7 @@
 // Have the ability to decide what information they want and what to compare it
 // against.
 // Imports a list of messages that the bot will be watching for reaction events.
-var watched = require('./temp/watching.json');
+
 module.exports.run = async (bot,message,args,server) => {
 
   var res = await server.query('SELECT * FROM users')
