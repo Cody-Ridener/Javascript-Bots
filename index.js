@@ -125,12 +125,11 @@ bot.on("message", async message =>{
   let args = messageArray.slice(1);
   //Cuts off the prefix and sends the command issued to the bot to be ran
   let commandfile = bot.commands.get(cmd.slice(prefix.length));
-  if(commandfile & acceptCommand) {
+  if(typeof commandfile != 'undefined'){
     commandfile.run(bot,message,args,server)
   }
-  else{
     bot.commands.get('writeContents').run(bot,message,args, server, false);
-  }
+
 })
 //////////////////////////////////////////////////////////
 
